@@ -23,7 +23,7 @@ One sunny morning, Budiman, an Informatics student, was assigned by his lecturer
 
 - *Code:*
 
-  
+  ```bash
   sudo apt -y update
   sudo apt -y install qemu-system build-essential bison flex libelf-dev libssl-dev bc grub-common grub-pc libncurses-dev libssl-dev mtools grub-pc-bin xorriso tmux
 
@@ -43,11 +43,38 @@ One sunny morning, Budiman, an Informatics student, was assigned by his lecturer
 
   sudo apt install -y busybox-static
   whereis busybox
-  
+  ```
 
 - *Explanation:*
 
-  put your answer here
+   ```bash
+  sudo apt -y update
+  sudo apt -y install qemu-system build-essential bison flex libelf-dev libssl-dev bc grub-common grub-pc libncurses-dev libssl-dev mtools grub-pc-bin xorriso tmux
+  ```
+  sintaks tersebut digunakan untuk melakukan update dan melakukan instalasi `qemu` yang dibutuhkan untuk menjalankan OS virtual yang digunakan dalam praktikum modul 3 ini.
+  ```bash
+  mkdir -p osboot
+  cd osboot
+  ```
+  digunakan untuk membuat direktori `osbbot` dan masuk ke dalamnya dengan menggunakan `cd`
+  ```bash
+  wget https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.1.1.tar.xz
+  tar -xvf linux-6.1.1.tar.xz
+  rm linux-6.1.1.tar.xz
+  cd linux-6.1.1
+  ```
+  digunakan untuk melakukan pengunduhan sorcecode untuk `linux-6.1.1.1` kemuadian melakukan ekstraksi dari file yang telah diunduh, selanjutnya menghapus file `.tar` agar tidak terjadi kebingungan, dan setelah itu masuk ke direktori berdasarkan hasil ekstrak tadi dengan menggunakan `cd`.
+  ```bash
+  make -j$(nproc)
+  cp arch/x86/boot/bzImage ..
+  ```
+  digunakan untuk menyusun kernel dan akan menghasilkan file `bzImage` selanjutnya file tersebut di-copy di direktori `osboot`.
+  ```bash
+  sudo apt install -y busybox-static
+  whereis busybox
+  ```
+  digunakan untuk meng-install `busybox`, tool yang digunakan untuk shell dan utilitas linux, dan melakukan verifikasi apakah `busybox` sudah benar ter-install.
+  
 
 - *Screenshot:*
 
@@ -63,15 +90,23 @@ One sunny morning, Budiman, an Informatics student, was assigned by his lecturer
 
 - *Code:*
 
-  
+  ```bash
   cd ..
   sudo bash
   mkdir -p myramdisk/{bin,dev,proc,sys,tmp,sisop}
-  
+  ```
 
 - *Explanation:*
 
-  put your answer here
+  ```bash
+  cd ..
+  sudo bash
+  ```
+  `cd ..` digunakan untuk kembali ke direktori satu level sebelumnya, dalam konteks ini maka akan kembali ke direktori `osboot` dan mengaktifkan kemampuan super user dengan `sudo bash`
+  ```bash
+  mkdir -p myramdisk/{bin,dev,proc,sys,tmp,sisop}
+  ```
+  digunakan untuk membuat direktori `myramdisk` yang di dalamnya ada direktori *bin, dev, proc, sys, tmp,* dan *sisop* sesuai yang diminta oleh soal.
 
 - *Screenshot:*
 
@@ -79,25 +114,25 @@ One sunny morning, Budiman, an Informatics student, was assigned by his lecturer
 
 ### Soal 3
 
-> Budiman lupa, Ia harus membuat sistem operasi ini dengan sistem *Multi User* sesuai permintaan Dosennya. Ia meminta kembali kepadamu untuk membantunya membuat beberapa user beserta directory tiap usernya dibawah directory home. Buat pula password tiap user-usernya dan aplikasikan dalam sistem operasi tersebut!
+> Budiman lupa, Ia harus membuat sistem operasi ini dengan sistem **Multi User** sesuai permintaan Dosennya. Ia meminta kembali kepadamu untuk membantunya membuat beberapa user beserta directory tiap usernya dibawah directory `home`. Buat pula password tiap user-usernya dan aplikasikan dalam sistem operasi tersebut!
 
-> _Budiman forgot that he needs to create a *Multi User* system as requested by the lecturer. He asks your help again to create several users and their corresponding home directories under the home directory. Also set each user's password and apply them in the OS!_
+> _Budiman forgot that he needs to create a **Multi User** system as requested by the lecturer. He asks your help again to create several users and their corresponding home directories under the `home` directory. Also set each user's password and apply them in the OS!_
 
-*Format:* user:pass
+**Format:** `user:pass`
 
-
+```
 root:Iniroot
 Budiman:PassBudi
 guest:guest
 praktikan1:praktikan1
 praktikan2:praktikan2
+```
 
+**Answer:**
 
-*Answer:*
-
-- *Code:*
-
+- **Code:**
   
+  ```bash
   cp -a /dev/null myramdisk/dev
   cp -a /dev/tty* myramdisk/dev
   cp -a /dev/zero myramdisk/dev
@@ -111,6 +146,7 @@ praktikan2:praktikan2
 
   mkdir -p home/{Budiman,guest,praktikan1,praktikan2}
   mkdir -p etc
+  mkdir -p root
   
   openssl passwd -1 Iniroot
   openssl passwd -1 PassBudi
@@ -120,17 +156,12 @@ praktikan2:praktikan2
 
   nano etc/passwd
 
-  root:$1$Up6B5klH$PHOmTNb8VhC7LAu68BKWp/:0:0:root:/root:/bin/sh
-  Budiman:$1$abcdefg$......:1001:100:Budiman:/home/Budiman:/bin/sh
-  guest:$1$abcdefg$......:1002:100:guest:/home/guest:/bin/sh
-  praktikan1:$1$abcdefg$......:1003:100:praktikan1:/home/praktikan1:/bin/sh
-  praktikan2:$1$abcdefg$......:1004:100:praktikan2:/home/praktikan2:/bin/sh
+  root:<pw hasil generate>:0:0:root:/root:/bin/sh
+  Budiman:<pw hasil generate>:1001:100:Budiman:/home/Budiman:/bin/sh
+  guest:<pw hasil generate>:1002:100:guest:/home/guest:/bin/sh
+  praktikan1:<pw hasil generate>:1003:100:praktikan1:/home/praktikan1:/bin/sh
+  praktikan2:<pw hasil generate>:1004:100:praktikan2:/home/praktikan2:/bin/sh
 
-  isi nano passwd
-  ganti setelah user: sampai :user
-  dengan hasil generate openssl
-
-  
   nano etc/group
 
   root:x:0:
@@ -153,12 +184,89 @@ praktikan2:praktikan2
   chmod +x init
 
   find . | cpio -oHnewc | gzip > ../myramdisk.gz
-  
+  ```  
 
 - *Explanation:*
 
-  put your answer here
+  ```bash
+  cp -a /dev/null myramdisk/dev
+  cp -a /dev/tty* myramdisk/dev
+  cp -a /dev/zero myramdisk/dev
+  cp -a /dev/console myramdisk/dev
+  ```
+  Menyalin device spesial dari direktori `dev` ke direkotori `myramdisk/dev`,agar sistem operasimini bisa menulis/menampilkan output (`/dev/tty*, /dev/console`), membaca karakter null(`/dev/null`), dan mengakses zero-byte stream(`/dev/zero`).
 
+  ```bash
+  cp /usr/bin/busybox myramdisk/bin
+  cd myramdisk/bin
+  ./busybox --install .
+  ```
+  Menyalin busybox dan menginstalnya di `myramdisk/bin` bertujuan agar command dasar bisa dioperasikan di sistem operasi ini.
+  ```bash
+  cd ..
+  mkdir -p home/{Root,Budiman,guest,praktikan1,praktikan2}
+  mkdir -p etc
+  mkdir -p root
+  ```
+  `cd ..` digunakan untuk kembali ke direktori satu lv sebelumnya, dalam konteks ini kembali ke direktori `myramdisk` selanjutnya membuat direktori `home` yang di dalamnya berisi *Root, Budiman, guest, praktikan1, praktikan2*, selain itu membuaat direktori `etc` yang digunakan untuk menyimpan *password* dari setiap user-nya.
+
+  ```bash
+  openssl passwd -1 Iniroot
+  openssl passwd -1 PassBudi
+  openssl passwd -1 guest
+  openssl passwd -1 praktikan1
+  openssl passwd -1 praktikan2
+  ```
+  digunakan untuk menghasilkan hash MD% dari password plaintext yang nantinya akan disimpan di file `passwd`
+
+  ```bash
+  nano etc/passwd
+  ```
+  digunakan untuk membuat file `passwd` di dir `etc` dengan isi dari file tersebut sebagai berikut
+  ```
+  root:<pw hasil generate>:0:0:root:/root:/bin/sh
+  Budiman:<pw hasil generate>:1001:100:Budiman:/home/Budiman:/bin/sh
+  guest:<pw hasil generate>:1002:100:guest:/home/guest:/bin/sh
+  praktikan1:<pw hasil generate>:1003:100:praktikan1:/home/praktikan1:/bin/sh
+  praktikan2:<pw hasil generate>:1004:100:praktikan2:/home/praktikan2:/bin/sh
+  ```
+
+  ```bash
+  nano etc/group
+  ```
+  digunakan untuk membuat file `passwd` di dir `etc` dengan isi dari file tersebut sebagai berikut
+  ```
+  root:x:0:
+  users:x:100:Budiman,guest,praktikan1,praktikan2
+  ```
+
+  ```bash
+  nano init
+  ```
+  membuat file `init` sebagi entry point sistem, di mana isinya sebagai berikut
+  ```
+  #!/bin/sh
+  /bin/mount -t proc none /proc
+  /bin/mount -t sysfs none /sys
+
+  while true
+  do
+    /bin/getty -L tty1 115200 vt100
+    sleep 1
+  done
+  ```
+  
+  ```bash
+  chmod +x init
+  ```
+  memberikan izin eksekusi pada file `init`
+
+  ```bash
+  find . | cpio -oHnewc | gzip > ../myramdisk.gz
+  ```
+  Mengarsipkan isi `myramdisk` ke dalam `initframs`, dengan peng-komoresan menghasilkan file ber-ekstensi `.gz` dan output disimpan di direktori satu level sebelumnya, yaitu `osboot`
+
+  
 - *Screenshot:*
 
   ![img3](assets/num%203.png)
